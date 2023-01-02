@@ -134,7 +134,7 @@ void setup() {
  
   
   // Create the BLE Device
-  BLEDevice::init("LVS-EDGE"); // CONFIGURATION: The name doesn't actually matter, The app identifies it by the reported id.
+  BLEDevice::init("LVS-EDGE"); // CONFIGURATION: The name has to match the actual device for xtoys to see it.
 
   // Create the BLE Server
   pServer = BLEDevice::createServer();
