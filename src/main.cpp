@@ -16,10 +16,10 @@ You should be able to use https://stpihkal.docs.buttplug.io/docs/stpihkal/protoc
 #include <BLE2902.h>
 
 
-//          ================= Motor pins ================
+//          ================= Pins ================
 uint8_t mtr1 = 13;
 uint8_t mtr2 = 14;
-
+uint8_t batPin = 32;
 
 BLEServer* pServer = NULL;
 BLECharacteristic* pTxCharacteristic = NULL;
@@ -78,7 +78,8 @@ class MySerialCallbacks: public BLECharacteristicCallbacks {
         pTxCharacteristic->setValue(messageBuf, 18);
         pTxCharacteristic->notify();
       } else if (rxValue == "Battery;") {
-        memmove(messageBuf, "69;", 3);
+        String bat = String(constrain(map(1.75*analogRead(batPin),3000,4200,0,100),0,100))+String(";"); // The constrain is to not get negative voltages when under 3V. The conversion constant (currently 1.75) was landed upon after 5 minutes messing around and will be changed.
+        memmove(messageBuf, bat.c_str(), 3);
         pTxCharacteristic->setValue(messageBuf, 3);
         pTxCharacteristic->notify();
       } else if (rxValue == "PowerOff;") {
@@ -120,18 +121,19 @@ class MySerialCallbacks: public BLECharacteristicCallbacks {
 };
 
 void setup() {
-  
-  
+  pinMode(batPin,INPUT);
   pinMode(mtr1, OUTPUT);
   pinMode(mtr2, OUTPUT);
-  delay(100);
   digitalWrite(mtr1, LOW);
   delay(100);
   analogWrite(mtr1, 127);
   delay(100);
   digitalWrite(mtr1, LOW);
-  delay(100);
  
+
+
+
+
   
   // Create the BLE Device
   BLEDevice::init("LVS-EDGE"); // CONFIGURATION: The name has to match the actual device for xtoys to see it.
